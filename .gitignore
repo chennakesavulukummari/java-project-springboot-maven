@@ -5,6 +5,9 @@
 *.ear
 *.nar
 
+# terraform
+.terraform*
+
 ### Maven ###
 target/
 pom.xml.tag

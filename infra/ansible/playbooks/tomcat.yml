@@ -1,0 +1,22 @@
+---
+# ==============================================================================
+# Playbook: Install and Configure Apache Tomcat
+# Target: tomcat_servers group
+# ==============================================================================
+- name: Setup Tomcat Application Server
+  hosts: tomcat_servers
+  become: true
+
+  roles:
+    - role: tomcat
+
+  post_tasks:
+    - name: Display Tomcat access info
+      ansible.builtin.debug:
+        msg:
+          - "=============================================="
+          - "Tomcat installed successfully!"
+          - "URL: http://{{ ansible_host }}:{{ tomcat_http_port }}"
+          - "Manager: http://{{ ansible_host }}:{{ tomcat_http_port }}/manager/html"
+          - "User: {{ tomcat_admin_user }}"
+          - "=============================================="

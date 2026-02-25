@@ -1,0 +1,23 @@
+---
+# ==============================================================================
+# Playbook: Install and Configure MySQL Database Server
+# Target: mysql_servers group
+# ==============================================================================
+- name: Setup MySQL Database Server
+  hosts: mysql_servers
+  become: true
+
+  roles:
+    - role: mysql
+
+  post_tasks:
+    - name: Display MySQL access info
+      ansible.builtin.debug:
+        msg:
+          - "=============================================="
+          - "MySQL installed successfully!"
+          - "Host: {{ ansible_host }}"
+          - "Port: {{ mysql_port }}"
+          - "Database: {{ mysql_app_database }}"
+          - "App User: {{ mysql_app_user }}"
+          - "=============================================="

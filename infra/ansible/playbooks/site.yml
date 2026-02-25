@@ -1,0 +1,15 @@
+---
+# ==============================================================================
+# Playbook: Full Stack Setup (Tomcat + MySQL)
+# ==============================================================================
+- name: Setup MySQL Database Server
+  hosts: mysql_servers
+  become: true
+  roles:
+    - role: mysql
+
+- name: Setup Tomcat Application Server
+  hosts: tomcat_servers
+  become: true
+  roles:
+    - role: tomcat

@@ -13,11 +13,11 @@ DB Admin/DB Developer: Ai DB Admin/DB Developer
 Cloud Computing Provider: AWS (DevOps Engineer)
 
 infra/
-    - vpc:
-        - public subnet:
+    - vpc: VPC ID (vpc-0305c51d2febe0d64)
+        - public subnet: 
             - Bastion host (Windows|Linux)
 
-        - web private subnet:
+        - web private subnet: subnet-0ab7ef12823c1b8c3
             - web ec2 instance (Windows|Linux) - Nginx/Apache/IIS/Httpd web server
 
         - app private subnet:
@@ -25,14 +25,14 @@ infra/
         
         - db private subnet:
             - db ec2 instance (Windows|Linux) - MySQL/PostgreSQL/Oracle/MSSQL database server
-    - s3:
+    <!-- - s3:
     - CloudFront:
     - Route 53:
     - IAM:
     - CloudWatch:
     - sns:
     - ses:
-    - acm:
+    - acm: -->
 
 # CI/CD Pipeline: Jenkins/GitLab CI/GitHub Actions
     - Source Code Management: Git (GitHub/GitLab/Bitbucket)

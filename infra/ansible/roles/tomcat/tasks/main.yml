@@ -1,0 +1,127 @@
+---
+# ==============================================================================
+# Tomcat Role - Install and Configure Apache Tomcat
+# ==============================================================================
+
+- name: Install Java JDK 17
+  ansible.builtin.dnf:
+    name: "{{ java_package }}"
+    state: present
+
+- name: Verify Java installation
+  ansible.builtin.command: java -version
+  register: java_version
+  changed_when: false
+
+- name: Display Java version
+  ansible.builtin.debug:
+    msg: "{{ java_version.stderr_lines }}"
+
+- name: Create tomcat group
+  ansible.builtin.group:
+    name: "{{ tomcat_group }}"
+    state: present
+
+- name: Create tomcat user
+  ansible.builtin.user:
+    name: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    home: "{{ tomcat_install_dir }}"
+    shell: /bin/false
+    create_home: false
+    system: true
+    state: present
+
+- name: Create Tomcat install directory
+  ansible.builtin.file:
+    path: "{{ tomcat_install_dir }}"
+    state: directory
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0755"
+
+- name: Download Apache Tomcat
+  ansible.builtin.get_url:
+    url: "{{ tomcat_archive_url }}"
+    dest: "/tmp/apache-tomcat-{{ tomcat_version }}.tar.gz"
+    mode: "0644"
+
+- name: Extract Tomcat archive
+  ansible.builtin.unarchive:
+    src: "/tmp/apache-tomcat-{{ tomcat_version }}.tar.gz"
+    dest: "{{ tomcat_install_dir }}"
+    remote_src: true
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    creates: "{{ tomcat_home }}"
+
+- name: Create symlink to latest Tomcat
+  ansible.builtin.file:
+    src: "{{ tomcat_home }}"
+    dest: "{{ tomcat_symlink }}"
+    state: link
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+
+- name: Set ownership on Tomcat directory
+  ansible.builtin.file:
+    path: "{{ tomcat_home }}"
+    state: directory
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    recurse: true
+
+- name: Make Tomcat scripts executable
+  ansible.builtin.file:
+    path: "{{ tomcat_home }}/bin"
+    state: directory
+    mode: "0755"
+    recurse: true
+
+- name: Configure tomcat-users.xml
+  ansible.builtin.template:
+    src: tomcat-users.xml.j2
+    dest: "{{ tomcat_home }}/conf/tomcat-users.xml"
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0640"
+  notify: Restart Tomcat
+
+- name: Configure Tomcat manager access (allow remote)
+  ansible.builtin.template:
+    src: manager-context.xml.j2
+    dest: "{{ tomcat_home }}/webapps/manager/META-INF/context.xml"
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0644"
+  notify: Restart Tomcat
+
+- name: Deploy Tomcat systemd service
+  ansible.builtin.template:
+    src: tomcat.service.j2
+    dest: /etc/systemd/system/tomcat.service
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart Tomcat
+
+- name: Enable and start Tomcat service
+  ansible.builtin.systemd:
+    name: tomcat
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Wait for Tomcat to start
+  ansible.builtin.uri:
+    url: "http://localhost:{{ tomcat_http_port }}"
+    status_code: 200
+  register: tomcat_status
+  retries: 10
+  delay: 5
+  until: tomcat_status.status == 200
+
+- name: Cleanup downloaded archive
+  ansible.builtin.file:
+    path: "/tmp/apache-tomcat-{{ tomcat_version }}.tar.gz"
+    state: absent

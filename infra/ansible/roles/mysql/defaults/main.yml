@@ -1,0 +1,16 @@
+# MySQL Configuration
+mysql_root_password: "Root@123"
+mysql_app_database: "springboot_db"
+mysql_app_user: "appuser"
+mysql_app_password: "AppUser@123"
+
+# Allow app server to connect (update with Tomcat server private IP)
+mysql_app_host: "%"
+
+# MySQL settings
+mysql_port: 3306
+mysql_bind_address: "0.0.0.0"
+mysql_max_connections: 150
+mysql_innodb_buffer_pool_size: "256M"
+mysql_character_set: "utf8mb4"
+mysql_collation: "utf8mb4_unicode_ci"

@@ -1,0 +1,107 @@
+---
+# ==============================================================================
+# MySQL Role - Install and Configure MySQL 8 Server
+# ==============================================================================
+
+- name: Install MySQL 8.0 community repo
+  ansible.builtin.dnf:
+    name: "https://dev.mysql.com/get/mysql80-community-release-el9-5.noarch.rpm"
+    state: present
+    disable_gpg_check: true
+
+- name: Install MySQL Server and dependencies
+  ansible.builtin.dnf:
+    name:
+      - mysql-community-server
+      - mysql-community-client
+      - python3-pip
+    state: present
+
+- name: Install PyMySQL (required for Ansible mysql modules)
+  ansible.builtin.pip:
+    name: PyMySQL
+    state: present
+
+- name: Deploy MySQL configuration
+  ansible.builtin.template:
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart MySQL
+
+- name: Enable and start MySQL service
+  ansible.builtin.systemd:
+    name: mysqld
+    enabled: true
+    state: started
+    daemon_reload: true
+
+- name: Check if MySQL root password is already set
+  ansible.builtin.shell: >
+    mysql -u root -e "SELECT 1;" 2>/dev/null
+  register: mysql_root_check
+  changed_when: false
+  failed_when: false
+
+- name: Get temporary MySQL root password
+  ansible.builtin.shell: >
+    grep 'temporary password' /var/log/mysqld.log | tail -1 | awk '{print $NF}'
+  register: mysql_temp_password
+  changed_when: false
+  when: mysql_root_check.rc != 0
+
+- name: Set MySQL root password
+  ansible.builtin.shell: >
+    mysql --connect-expired-password -u root -p'{{ mysql_temp_password.stdout }}'
+    -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_password }}';"
+  when:
+    - mysql_root_check.rc != 0
+    - mysql_temp_password.stdout | length > 0
+  no_log: true
+
+- name: Create application database
+  community.mysql.mysql_db:
+    name: "{{ mysql_app_database }}"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/lib/mysql/mysql.sock
+    encoding: "{{ mysql_character_set }}"
+    collation: "{{ mysql_collation }}"
+
+- name: Create application database user
+  community.mysql.mysql_user:
+    name: "{{ mysql_app_user }}"
+    password: "{{ mysql_app_password }}"
+    host: "{{ mysql_app_host }}"
+    priv: "{{ mysql_app_database }}.*:ALL"
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/lib/mysql/mysql.sock
+  no_log: true
+
+- name: Remove anonymous MySQL users
+  community.mysql.mysql_user:
+    name: ""
+    host_all: true
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/lib/mysql/mysql.sock
+
+- name: Remove MySQL test database
+  community.mysql.mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    login_unix_socket: /var/lib/mysql/mysql.sock
+
+- name: Verify MySQL is listening
+  ansible.builtin.wait_for:
+    port: "{{ mysql_port }}"
+    delay: 5
+    timeout: 30
