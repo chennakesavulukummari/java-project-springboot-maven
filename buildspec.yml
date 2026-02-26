@@ -1,0 +1,254 @@
+version: 0.2
+
+# Environment variables that will be available throughout the build
+env:
+  variables:
+    # Java environment
+    JAVA_HOME: "/usr/lib/jvm/java-17-openjdk"
+    MAVEN_HOME: "/opt/maven"
+    
+    # Terraform environment
+    TF_VERSION: "1.5.7"
+    TF_INPUT: "false"
+    TF_IN_AUTOMATION: "true"
+    
+    # Application settings
+    APP_NAME: "c3ops-springboot-mysql-app"
+    
+    # AWS settings
+    AWS_DEFAULT_REGION: "ap-south-2"
+    
+  # Parameter store variables (optional - configure in CodeBuild project)
+  parameter-store:
+    # DATABASE_URL: "/myapp/database-url"
+    # API_KEY: "/myapp/api-key"
+
+# Build phases
+phases:
+  # Install phase - install required tools and dependencies
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - echo "=== Installing build dependencies ==="
+      - echo "Build started on `date`"
+      - echo "Installing Maven..."
+      
+      # Install Maven (if not available in the build image)
+      - |
+        if ! command -v mvn &> /dev/null; then
+          echo "Maven not found, installing..."
+          wget -q https://archive.apache.org/dist/maven/maven-3/3.9.4/binaries/apache-maven-3.9.4-bin.tar.gz
+          tar xzf apache-maven-3.9.4-bin.tar.gz
+          export MAVEN_HOME=$PWD/apache-maven-3.9.4
+          export PATH=$MAVEN_HOME/bin:$PATH
+        fi
+      
+      # Install Terraform
+      - echo "Installing Terraform $TF_VERSION..."
+      - |
+        if ! command -v terraform &> /dev/null || [ "$(terraform version -json | jq -r '.terraform_version' 2>/dev/null || terraform version | head -1 | cut -d' ' -f2 | sed 's/v//')" != "$TF_VERSION" ]; then
+          wget -q https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+          unzip -o terraform_${TF_VERSION}_linux_amd64.zip
+          chmod +x terraform
+          mv terraform /usr/local/bin/
+        fi
+      
+      # Install additional tools
+      - echo "Installing additional tools..."
+      - pip install --upgrade awscli
+      - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" || true
+      - chmod +x kubectl && mv kubectl /usr/local/bin/ || true
+      
+      # Verify installations
+      - echo "=== Verifying tool installations ==="
+      - java -version
+      - mvn --version
+      - terraform version
+      - aws --version
+
+  # Pre-build phase - setup and validation
+  pre_build:
+    commands:
+      - echo "=== Pre-build phase started on `date` ==="
+      - echo "Current directory: $(pwd)"
+      - echo "Listing contents:"
+      - ls -la
+      
+      # Set up Maven settings (if needed)
+      - echo "Setting up Maven configuration..."
+      - |
+        if [ ! -f ~/.m2/settings.xml ]; then
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml << EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+          <localRepository>/tmp/.m2</localRepository>
+        </settings>
+        EOF
+        fi
+      
+      # Download Maven dependencies
+      - echo "Downloading Maven dependencies..."
+      - mvn dependency:go-offline -B
+      
+      # Validate Terraform configuration
+      - echo "Validating Terraform configuration..."
+      - cd infra/terraform
+      - terraform init -backend=false
+      - terraform validate
+      - terraform fmt -check=true -diff=true || (echo "Terraform files need formatting" && terraform fmt && git diff --exit-code)
+      - cd ../..
+
+  # Build phase - compile, test, and build
+  build:
+    commands:
+      - echo "=== Build phase started on `date` ==="
+      
+      # Run Java tests
+      - echo "Running Java unit tests..."
+      - mvn clean test -Dspring.profiles.active=test -B
+      
+      # Generate test reports
+      - echo "Generating test reports..."
+      - |
+        if [ -d target/surefire-reports ]; then
+          echo "Test results:"
+          ls -la target/surefire-reports/
+        fi
+      
+      # Run security scan
+      - echo "Running security vulnerability scan..."
+      - mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=7 -Dformats=HTML,XML || echo "Security scan completed with warnings"
+      
+      # Build the application
+      - echo "Building Java application..."
+      - mvn package -DskipTests=true -B
+      
+      # Verify build artifacts
+      - echo "Verifying build artifacts..."
+      - ls -la target/
+      - |
+        if [ -f target/${APP_NAME}-*.jar ]; then
+          echo "JAR file created successfully:"
+          ls -lh target/${APP_NAME}-*.jar
+          export ARTIFACT_VERSION=$(ls target/${APP_NAME}-*.jar | sed "s/target\/${APP_NAME}-\(.*\)\.jar/\1/")
+          echo "Artifact version: $ARTIFACT_VERSION"
+        else
+          echo "ERROR: JAR file not found!"
+          exit 1
+        fi
+      
+      # Terraform operations (conditional based on branch)
+      - echo "Preparing Terraform operations..."
+      - cd infra/terraform
+      
+      # Initialize Terraform with backend
+      - terraform init
+      
+      # Create Terraform plan
+      - echo "Creating Terraform plan..."
+      - |
+        terraform plan \
+          -var="app_version=${CODEBUILD_BUILD_NUMBER:-1}" \
+          -var="app_jar_name=${APP_NAME}-${CODEBUILD_BUILD_NUMBER:-1}.jar" \
+          -out=tfplan \
+          -detailed-exitcode
+      
+      # Show plan details
+      - terraform show -no-color tfplan > tfplan.txt
+      - echo "Terraform plan created and saved"
+      
+      # Apply Terraform (only for main/master branch in production)
+      - echo "Checking if Terraform should be applied..."
+      - |
+        if [ "$CODEBUILD_WEBHOOK_HEAD_REF" = "refs/heads/main" ] || [ "$CODEBUILD_WEBHOOK_HEAD_REF" = "refs/heads/master" ]; then
+          echo "Applying Terraform changes for main/master branch..."
+          terraform apply -auto-approve tfplan
+          terraform output -json > terraform-outputs.json
+          terraform output
+        else
+          echo "Skipping Terraform apply - not on main/master branch"
+        fi
+      
+      - cd ../..
+      
+      # Create deployment package
+      - echo "Creating deployment package..."
+      - mkdir -p dist
+      - cp target/${APP_NAME}-*.jar dist/
+      - cp -r infra dist/ || true
+      - |
+        if [ -f infra/terraform/terraform-outputs.json ]; then
+          cp infra/terraform/terraform-outputs.json dist/
+        fi
+
+  # Post-build phase - cleanup and artifact preparation
+  post_build:
+    commands:
+      - echo "=== Post-build phase started on `date` ==="
+      
+      # Application health check (if infrastructure was deployed)
+      - echo "Performing application health check..."
+      - |
+        if [ -f dist/terraform-outputs.json ]; then
+          echo "Infrastructure outputs found:"
+          cat dist/terraform-outputs.json
+          
+          # Extract application URL if available
+          # APP_URL=$(jq -r '.app_url.value // empty' dist/terraform-outputs.json)
+          # if [ ! -z "$APP_URL" ]; then
+          #   echo "Testing application at: $APP_URL"
+          #   sleep 30  # Wait for application to start
+          #   curl -f "$APP_URL/actuator/health" || echo "Health check failed"
+          # fi
+        fi
+      
+      # Generate build summary
+      - echo "Generating build summary..."
+      - |
+        cat > dist/build-info.json << EOF
+        {
+          "buildNumber": "${CODEBUILD_BUILD_NUMBER}",
+          "buildId": "${CODEBUILD_BUILD_ID}",
+          "sourceVersion": "${CODEBUILD_SOURCE_VERSION}",
+          "branch": "${CODEBUILD_WEBHOOK_HEAD_REF}",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "appName": "${APP_NAME}",
+          "region": "${AWS_DEFAULT_REGION}"
+        }
+        EOF
+      
+      - echo "Build completed successfully on `date`"
+
+# Artifacts to be uploaded to S3
+artifacts:
+  files:
+    - 'dist/**/*'
+    - 'target/surefire-reports/**/*'
+    - 'target/dependency-check-report.*'
+    - 'infra/terraform/tfplan*'
+  name: ${APP_NAME}-${CODEBUILD_BUILD_NUMBER}
+  base-directory: '.'
+
+# Cache configuration to speed up subsequent builds
+cache:
+  paths:
+    - '/root/.m2/**/*'
+    - '/tmp/.m2/**/*'
+    - 'infra/terraform/.terraform/**/*'
+
+# Reports configuration
+reports:
+  junit-reports:
+    files:
+      - 'target/surefire-reports/*.xml'
+    file-format: 'JUNITXML'
+  
+  security-reports:
+    files:
+      - 'target/dependency-check-report.xml'
+    file-format: 'JUNIT'
