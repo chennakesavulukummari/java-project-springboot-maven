@@ -4,30 +4,63 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
   <servers>
     <server>
-      <id>mom-java-maven-artifacts-mom</id>
-      <username>aws</username>
-      <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>
+      <id>release</id>
+      <username>devops</username>
+      <password>Redhat@123456</password>
+    </server>
+    <server>
+      <id>snapshots</id>
+      <username>devops</username>
+      <password>Redhat@123456</password>
     </server>
   </servers>
 
   <profiles>
     <profile>
-      <id>mom-java-maven-artifacts-mom</id>
+      <id>jfrog</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <repositories>
         <repository>
-          <id>mom-java-maven-artifacts-mom</id>
-          <url>https://mom-225989338000.d.codeartifact.ap-south-1.amazonaws.com/maven/java-maven-artifacts-mom/</url>
+          <id>release</id>
+          <name>libs-release-local</name>
+          <url>http://18.61.211.12:8081/artifactory/libs-release-local/</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>snapshots</id>
+          <name>libs-snapshot-local</name>
+          <url>http://18.61.211.12:8081/artifactory/libs-snapshot-local/</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
-          <id>mom-java-maven-artifacts-mom</id>
-          <url>https://mom-225989338000.d.codeartifact.ap-south-1.amazonaws.com/maven/java-maven-artifacts-mom/</url>
+          <id>release</id>
+          <name>libs-release-local</name>
+          <url>http://18.61.211.12:8081/artifactory/libs-release-local/</url>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+          <id>snapshots</id>
+          <name>libs-snapshot-local</name>
+          <url>http://18.61.211.12:8081/artifactory/libs-snapshot-local/</url>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>
   </profiles>
+
+  <activeProfiles>
+    <activeProfile>jfrog</activeProfile>
+  </activeProfiles>
 </settings>
