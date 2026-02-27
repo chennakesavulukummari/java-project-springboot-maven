@@ -90,12 +90,12 @@
         </repository>
     </repositories> -->
 
-    <distributionManagement>
+    <!-- <distributionManagement>
         <repository>
             <id>mom-java-maven-artifacts-mom</id>
             <url>https://mom-225989338000.d.codeartifact.ap-south-1.amazonaws.com/maven/java-maven-artifacts-mom/</url>
         </repository>
-    </distributionManagement>
+    </distributionManagement> -->
 
     <build>
         <plugins>
