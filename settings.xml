@@ -4,7 +4,7 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
   <servers>
     <server>
-      <id>mom-Java-Artifact-MoM</id>
+      <id>mom-java-maven-artifacts-mom</id>
       <username>aws</username>
       <password>${env.CODEARTIFACT_AUTH_TOKEN}</password>
     </server>
@@ -12,20 +12,20 @@
 
   <profiles>
     <profile>
-      <id>mom-Java-Artifact-MoM</id>
+      <id>mom-java-maven-artifacts-mom</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <repositories>
         <repository>
-          <id>mom-Java-Artifact-MoM</id>
-          <url>https://mom-225989338000.d.codeartifact.ap-south-1.amazonaws.com/maven/Java-Artifact-MoM/</url>
+          <id>mom-java-maven-artifacts-mom</id>
+          <url>https://mom-225989338000.d.codeartifact.ap-south-1.amazonaws.com/maven/java-maven-artifacts-mom/</url>
         </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
-          <id>mom-Java-Artifact-MoM</id>
-          <url>https://mom-225989338000.d.codeartifact.ap-south-1.amazonaws.com/maven/Java-Artifact-MoM/</url>
+          <id>mom-java-maven-artifacts-mom</id>
+          <url>https://mom-225989338000.d.codeartifact.ap-south-1.amazonaws.com/maven/java-maven-artifacts-mom/</url>
         </pluginRepository>
       </pluginRepositories>
     </profile>
