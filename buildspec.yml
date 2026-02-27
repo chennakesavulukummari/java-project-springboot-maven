@@ -15,11 +15,12 @@ phases:
       - cp -pvr settings.xml /root/.m2/settings.xml
       - ls -lrt /root/.m2/settings.xml
       - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain mom --domain-owner 225989338000 --region ap-south-1 --query authorizationToken --output text`
-      - mvn package 
+      - mvn deploy -DskipTests=true 
       - echo Build completed on `date`
   post_build:
     commands:
       - echo Deliver Artifact To Remote Tomcat Server `date`
 artifacts:
+  base-directory: target
   files:
-    - '**/*'
+    - '*.jar'
