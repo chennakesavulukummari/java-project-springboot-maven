@@ -12,6 +12,9 @@ phases:
     commands:
       - echo Build started on `date`
       #- mvn clean validate compile test install verify package
+      - cp -pvr settings.xml /root/.m2/settings.xml
+      - ls -lrt /root/.m2/settings.xml
+      - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain mom --domain-owner 225989338000 --region ap-south-1 --query authorizationToken --output text`
       - mvn package 
       - echo Build completed on `date`
   post_build:

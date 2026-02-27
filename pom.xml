@@ -83,6 +83,20 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>mom-Java-Artifact-MoM</id>
+            <url>https://mom-225989338000.d.codeartifact.ap-south-1.amazonaws.com/maven/Java-Artifact-MoM/</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>mom-Java-Artifact-MoM</id>
+            <url>https://mom-225989338000.d.codeartifact.ap-south-1.amazonaws.com/maven/Java-Artifact-MoM/</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
