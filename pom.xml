@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>c3ops-springboot-mysql-app</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>c3ops-springboot-mysql-app</name>
+    <artifactId>mom-java</artifactId>
+    <version>1.3.6-SNAPSHOT</version>
+    <name>mom-java</name>
     <description>Spring Boot Web Application with MySQL</description>
 
     <properties>
