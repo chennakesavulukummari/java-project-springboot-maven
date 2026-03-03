@@ -52,15 +52,15 @@ pipeline {
             }
         }
 
-          stage('Stage-9 : Deployment - Deploy a Artifact eg-1.0.0-SNAPSHOT.war file to Tomcat Server') { 
+          stage('Stage-9 : Deployment - Deploy a Artifact dailybread-1.0.0-SNAPSHOT.war file to Tomcat Server') { 
             steps {
-                sh 'curl -u admin:admin123 -T target/**.war "http://40.192.110.39:8080/manager/text/deploy?path=/eg&update=true"'
+                sh 'curl -u admin:admin123 -T target/**.war "http://40.192.110.39:8080/manager/text/deploy?path=/dailybread&update=true"'
             }
         } 
   
           stage('Stage-10 : SmokeTest') { 
             steps {
-                sh 'curl --retry-delay 10 --retry 5 "http://40.192.110.39:8080/eg"'
+                sh 'curl --retry-delay 10 --retry 5 "http://40.192.110.39:8080/dailybread"'
             }
         }
     }
