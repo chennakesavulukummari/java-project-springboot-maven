@@ -12,16 +12,16 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>earthgardens</artifactId>
-    <version>7.0.0-SNAPSHOT</version>
+    <artifactId>eg</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <!-- <version>3.3.6</version> -->
-    <name>EarthGardens</name>
+    <name>EG</name>
     <description>Spring Boot Web Application with MySQL</description>
 
     <properties>
         <java.version>17</java.version>
 
-        <sonar.host.url>http://18.61.235.167:9000</sonar.host.url>
+        <sonar.host.url>http://18.60.222.78:9000</sonar.host.url>
         <sonar.organization>JavaProject</sonar.organization>
         <sonar.projectKey>JavaProject</sonar.projectKey>
         <sonar.login>sqp_0fb3a608eb9800cb36c6ebe4933e4ba440c85dbe</sonar.login>
@@ -94,13 +94,13 @@
     <snapshotRepository>
         <id>snapshots</id>
         <name>libs-snapshot-local</name>
-        <url>http://18.60.222.169:8081/artifactory/libs-snapshot-local/</url>
+        <url>http://18.61.85.130:8081/artifactory/libs-snapshot-local/</url>
     </snapshotRepository>
     
     <repository>
         <id>release</id>
         <name>libs-release-local</name>
-        <url>http://18.60.222.169:8081/artifactory/libs-release-local/</url>
+        <url>http://18.61.85.130:8081/artifactory/libs-release-local/</url>
     </repository>
 </distributionManagement>
 

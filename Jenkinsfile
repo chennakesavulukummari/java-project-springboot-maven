@@ -52,16 +52,16 @@ pipeline {
             }
         }
 
-        //   stage('Stage-9 : Deployment - Deploy a Artifact devops-3.0.0-SNAPSHOT.war file to Tomcat Server') { 
-        //     steps {
-        //         sh 'curl -u admin:redhat@123 -T target/**.war "http://54.221.7.95:8080/manager/text/deploy?path=/c3ops&update=true"'
-        //     }
-        // } 
+          stage('Stage-9 : Deployment - Deploy a Artifact eg-1.0.0-SNAPSHOT.war file to Tomcat Server') { 
+            steps {
+                sh 'curl -u admin:admin123 -T target/**.war "http://40.192.110.39:8080/manager/text/deploy?path=/eg&update=true"'
+            }
+        } 
   
-        //   stage('Stage-10 : SmokeTest') { 
-        //     steps {
-        //         sh 'curl --retry-delay 10 --retry 5 "http://54.221.7.95:8080/c3ops"'
-        //     }
-        // }
+          stage('Stage-10 : SmokeTest') { 
+            steps {
+                sh 'curl --retry-delay 10 --retry 5 "http://40.192.110.39:8080/eg"'
+            }
+        }
     }
 }
