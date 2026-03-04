@@ -4,8 +4,8 @@ set -e
 ############################
 # VARIABLES
 ############################
-TOMCAT_VERSION="10.1.34"
-TOMCAT_MAJOR_VERSION="10"
+TOMCAT_VERSION="9.0.115"
+TOMCAT_MAJOR_VERSION="9"
 INSTALL_DIR="/opt/tomcat"
 TOMCAT_USER="tomcat"
 TOMCAT_GROUP="tomcat"
@@ -115,7 +115,7 @@ systemctl start tomcat
 ############################
 # CONFIGURE FIREWALL
 ############################
-ufw allow 8080/tcp || true
+#ufw allow 8080/tcp || true
 
 ############################
 # DISPLAY ACCESS INFO

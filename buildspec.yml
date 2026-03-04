@@ -22,14 +22,14 @@ phases:
       # - echo Build completed on `date`
   post_build:
     commands:
-      # - echo Deliver Artifact To Remote Tomcat Server `date`
-      # - echo "Deploying to Tomcat..."
-      # - WAR_FILE=$(ls target/*.war | head -n 1)
-      # - echo "Deploying $WAR_FILE"
-      # - curl --fail --show-error --silent \
-      #   -u admin:admin123 \
-      #   -T $WAR_FILE \
-      #   "http://40.192.110.39:8080/manager/text/deploy?path=/eg&update=true"
+      - echo Deliver Artifact To Remote Tomcat Server `date`
+      - echo "Deploying to Tomcat..."
+      - WAR_FILE=$(ls target/*.war | head -n 1)
+      - echo "Deploying $WAR_FILE"
+      - curl --fail --show-error --silent \
+        -u admin:redhat@123 \
+        -T $WAR_FILE \
+        "http://16.112.118.177:8080/manager/text/deploy?path=/cloudbinary&update=true"
 artifacts:
   base-directory: target
   files:

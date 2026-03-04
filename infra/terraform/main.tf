@@ -40,7 +40,7 @@ locals {
 # Tomcat Application Server (App Subnet)
 # ==============================================================================
 resource "aws_instance" "tomcat_server" {
-  ami                    = local.app_ami_id
+  ami                    = var.app_ami_id
   instance_type          = var.app_instance_type
   subnet_id              = var.app_subnet_id
   key_name               = var.key_pair_name
@@ -68,28 +68,28 @@ resource "aws_instance" "tomcat_server" {
 # ==============================================================================
 # MySQL Database Server (DB Private Subnet)
 # ==============================================================================
-resource "aws_instance" "mysql_server" {
-  ami                    = local.db_ami_id
-  instance_type          = var.db_instance_type
-  subnet_id              = var.db_subnet_id
-  key_name               = var.key_pair_name
-  vpc_security_group_ids = var.db_security_group_ids
-  iam_instance_profile   = var.iam_instance_profile
-  user_data              = file("${path.module}/mysql-user-data.sh")
+# resource "aws_instance" "mysql_server" {
+#   ami                    = local.db_ami_id
+#   instance_type          = var.db_instance_type
+#   subnet_id              = var.db_subnet_id
+#   key_name               = var.key_pair_name
+#   vpc_security_group_ids = var.db_security_group_ids
+#   iam_instance_profile   = var.iam_instance_profile
+#   user_data              = file("${path.module}/mysql-user-data.sh")
 
-  root_block_device {
-    volume_size           = var.db_volume_size
-    volume_type           = "gp3"
-    encrypted             = true
-    delete_on_termination = true
-  }
+#   root_block_device {
+#     volume_size           = var.db_volume_size
+#     volume_type           = "gp3"
+#     encrypted             = true
+#     delete_on_termination = true
+#   }
 
-  tags = merge(local.common_tags, {
-    Name = "${var.project_name}-mysql-server"
-    Role = "database-server"
-  })
+#   tags = merge(local.common_tags, {
+#     Name = "${var.project_name}-mysql-server"
+#     Role = "database-server"
+#   })
 
-  lifecycle {
-    ignore_changes = [ami]
-  }
-}
+#   lifecycle {
+#     ignore_changes = [ami]
+#   }
+# }

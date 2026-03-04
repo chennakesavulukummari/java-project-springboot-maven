@@ -15,6 +15,7 @@
     <artifactId>eg</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <!-- <version>3.3.6</version> -->
+    <packaging>war</packaging>
     <name>EG</name>
     <description>Spring Boot Web Application with MySQL</description>
 
@@ -33,6 +34,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Provided by external servlet container when deploying WAR -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Spring Data JPA -->
