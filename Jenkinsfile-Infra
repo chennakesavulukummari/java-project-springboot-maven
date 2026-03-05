@@ -1,0 +1,144 @@
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+        ansiColor('xterm')
+    }
+
+    parameters {
+        booleanParam(name: 'RUN_APPLY', defaultValue: false, description: 'Run terraform apply')
+        booleanParam(name: 'RUN_DESTROY', defaultValue: false, description: 'Run terraform destroy')
+    }
+
+    environment {
+        TF_VERSION = '1.9.5'
+        TF_WORKING_DIR = 'infra/devops-tomcat'
+        TF_IN_AUTOMATION = 'true'
+        TF_INPUT = 'false'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install Terraform') {
+            steps {
+                sh '''
+                    set -euo pipefail
+
+                    mkdir -p "${WORKSPACE}/.bin"
+                    export PATH="${WORKSPACE}/.bin:${PATH}"
+
+                    if command -v terraform >/dev/null 2>&1; then
+                      CURRENT_VERSION=$(terraform version -json 2>/dev/null | sed -n 's/.*"terraform_version":"\\([^"]*\\)".*/\\1/p' || true)
+                    else
+                      CURRENT_VERSION=""
+                    fi
+
+                    if [ "${CURRENT_VERSION}" != "${TF_VERSION}" ]; then
+                      echo "Installing Terraform ${TF_VERSION}..."
+                      OS=$(uname | tr '[:upper:]' '[:lower:]')
+                      ARCH=$(uname -m)
+                      if [ "${ARCH}" = "x86_64" ]; then ARCH="amd64"; fi
+                      if [ "${ARCH}" = "aarch64" ]; then ARCH="arm64"; fi
+
+                      curl -sSLo terraform.zip "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_${OS}_${ARCH}.zip"
+                      unzip -o terraform.zip -d "${WORKSPACE}/.bin"
+                      chmod +x "${WORKSPACE}/.bin/terraform"
+                    fi
+
+                    export PATH="${WORKSPACE}/.bin:${PATH}"
+                    terraform version
+                '''
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    sh '''
+                        set -euo pipefail
+                        export PATH="${WORKSPACE}/.bin:${PATH}"
+                        terraform init
+                    '''
+                }
+            }
+        }
+
+        stage('Terraform Fmt') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    sh '''
+                        set -euo pipefail
+                        export PATH="${WORKSPACE}/.bin:${PATH}"
+                        terraform fmt -recursive
+                    '''
+                }
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    sh '''
+                        set -euo pipefail
+                        export PATH="${WORKSPACE}/.bin:${PATH}"
+                        terraform validate
+                    '''
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    sh '''
+                        set -euo pipefail
+                        export PATH="${WORKSPACE}/.bin:${PATH}"
+                        terraform plan -out=tfplan
+                    '''
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            when {
+                expression { return params.RUN_APPLY }
+            }
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    sh '''
+                        set -euo pipefail
+                        export PATH="${WORKSPACE}/.bin:${PATH}"
+                        terraform apply -auto-approve tfplan
+                    '''
+                }
+            }
+        }
+
+        stage('Terraform Destroy') {
+            when {
+                expression { return params.RUN_DESTROY }
+            }
+            steps {
+                dir("${TF_WORKING_DIR}") {
+                    sh '''
+                        set -euo pipefail
+                        export PATH="${WORKSPACE}/.bin:${PATH}"
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'infra/devops-tomcat/tfplan, infra/devops-tomcat/.terraform.lock.hcl', allowEmptyArchive: true
+        }
+    }
+}

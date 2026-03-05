@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "aifinops-dev"
-    key    = "mom-tomcat-terraform.tfstate"
+    key    = "mom-tomcat-test-terraform.tfstate"
     region = "ap-south-2"
   }
 }
