@@ -1,0 +1,44 @@
+version: 0.2
+
+env:
+  variables:
+    TF_VERSION: "1.9.5"
+    TF_WORKING_DIR: "infra/devops-tomcat"
+    TF_IN_AUTOMATION: "true"
+    TF_INPUT: "false"
+
+phases:
+  install:
+    commands:
+      - echo "Installing Terraform ${TF_VERSION}"
+      - curl -sSLo terraform.zip "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+      - unzip -o terraform.zip
+      - chmod +x terraform
+      - mv terraform /usr/local/bin/terraform
+      - terraform version
+
+  pre_build:
+    commands:
+      - echo "Preparing Terraform workspace"
+      - cd ${TF_WORKING_DIR}
+      - terraform init
+      - terraform fmt
+      - terraform validate
+
+  build:
+    commands:
+      - echo "Running Terraform plan and apply"
+      - cd ${TF_WORKING_DIR}
+      - terraform plan -out=tfplan
+      #- terraform apply -auto-approve tfplan
+
+  post_build:
+    commands:
+      - echo "Running Terraform destroy"
+      - cd ${TF_WORKING_DIR}
+      #- terraform destroy -auto-approve
+
+artifacts:
+  files:
+    - infra/devops-tomcat/tfplan
+    - infra/devops-tomcat/.terraform.lock.hcl
