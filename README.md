@@ -114,3 +114,19 @@ Tests use an **H2 in-memory database** so MySQL is not required for testing.
 | ORM         | Spring Data JPA         |
 | Build Tool  | Maven                   |
 | Testing     | JUnit 5, MockMvc, H2   |
+
+
+
+# Major Container Runtimes:
+
+Docker Engine – The most popular runtime for developers, supports OCI images.
+
+Podman – Rootless, daemonless runtime from Red Hat, focused on security.
+
+containerd – Industry-standard runtime, originally from Docker, now part of CNCF.
+
+CRI-O – Lightweight runtime designed specifically for Kubernetes.
+
+rkt (Rocket) – Developed by CoreOS (now deprecated, but historically important).
+
+LXC/LXD – Linux Containers project, closer to lightweight VMs than app containers.
