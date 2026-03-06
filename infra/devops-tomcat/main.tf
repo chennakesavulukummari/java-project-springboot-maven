@@ -1,6 +1,6 @@
 # Security Group
-resource "aws_security_group" "tomcat_sg" {
-  name        = "tomcat-sg"
+resource "aws_security_group" "tomcat_test_sg" {
+  name        = "tomcat-test-sg"
   description = "Allow SSH, HTTP and Tomcat"
 
   ingress {
@@ -52,7 +52,7 @@ resource "aws_security_group" "tomcat_sg" {
 
 # IAM Role for EC2
 resource "aws_iam_role" "tomcat_role" {
-  name = "tomcat-ec2-role"
+  name = "tomcat-test-ec2-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -66,7 +66,7 @@ resource "aws_iam_role" "tomcat_role" {
   })
 
   tags = {
-    Name         = "tomcat-iam-role"
+    Name         = "tomcat-test-iam-role"
     Environment  = var.environment
     Project_Name = var.project_name
     Created_By   = var.Created_By
@@ -109,7 +109,7 @@ resource "aws_instance" "tomcat" {
   ami                    = var.ami
   instance_type          = var.instance_type
   key_name               = var.key_name
-  vpc_security_group_ids = [aws_security_group.tomcat_sg.id]
+  vpc_security_group_ids = [aws_security_group.tomcat_test_sg.id]
   iam_instance_profile   = aws_iam_instance_profile.tomcat_instance_profile.name
   user_data              = file("user-data.sh")
 

@@ -20,7 +20,7 @@ output "tomcat_url" {
 
 output "security_group_id" {
   description = "The ID of the security group"
-  value       = aws_security_group.tomcat_sg.id
+  value       = aws_security_group.tomcat_test_sg.id
 }
 
 output "iam_role_arn" {
