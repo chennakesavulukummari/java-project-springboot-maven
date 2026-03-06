@@ -93,11 +93,11 @@ resource "aws_iam_role_policy_attachment" "tomcat_ssm_access" {
 
 # IAM Instance Profile
 resource "aws_iam_instance_profile" "tomcat_instance_profile" {
-  name = "tomcat-instance-profile"
+  name = "tomcat-test-instance-profile"
   role = aws_iam_role.tomcat_role.name
 
   tags = {
-    Name         = "tomcat-instance-profile"
+    Name         = "tomcat-test-instance-profile"
     Environment  = var.environment
     Project_Name = var.project_name
     Created_By   = var.Created_By
