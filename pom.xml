@@ -2,8 +2,8 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.aws.codestar.projecttemplates</groupId>
-    <artifactId>MadeOfMemories</artifactId>
-    <version>6.3.0</version>
+    <artifactId>MoM</artifactId>
+    <version>1.0.0</version>
     <!-- <version>3.6.3-SNAPSHOT</version> -->
     <packaging>war</packaging>
     <name>Made Of Memories - Sample Spring MVC Application</name>
@@ -104,7 +104,7 @@
                     <version>3.2.2</version>
                     <configuration>
                         <warSourceDirectory>src/main/webapp</warSourceDirectory>
-                        <warName>MadeOfMemories</warName>
+                        <warName>MoM</warName>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
                 </plugin>
@@ -127,6 +127,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <finalName>MadeOfMemories</finalName>
+        <finalName>MoM</finalName>
     </build>
 </project>
