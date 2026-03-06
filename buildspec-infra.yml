@@ -20,16 +20,22 @@ phases:
   pre_build:
     commands:
       - echo "Preparing Terraform workspace"
+      - pwd
+      - ls -lrta
       - cd ${TF_WORKING_DIR}
+      - pwd
+      - ls -lrta
       - terraform init
       - terraform fmt
       - terraform validate
 
   build:
     commands:
-      - echo "Running Terraform plan and apply"
-      - cd ${TF_WORKING_DIR}
-      - terraform plan -out=tfplan
+      # - echo "Running Terraform plan and apply"
+      # - cd ${TF_WORKING_DIR}
+      # - pwd
+      # - ls -lrta
+      # - terraform plan -out=tfplan
       #- terraform apply -auto-approve tfplan
 
   post_build:
