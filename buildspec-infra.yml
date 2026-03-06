@@ -31,17 +31,17 @@ phases:
 
   build:
     commands:
-      # - echo "Running Terraform plan and apply"
-      # - cd ${TF_WORKING_DIR}
-      # - pwd
-      # - ls -lrta
-      # - terraform plan -out=tfplan
-      #- terraform apply -auto-approve tfplan
+      - echo "Running Terraform plan and apply"
+      #- cd ${TF_WORKING_DIR}
+      - pwd
+      - ls -lrta
+      - terraform plan -out=tfplan
+      - terraform apply -auto-approve tfplan
 
   post_build:
     commands:
       - echo "Running Terraform destroy"
-      - cd ${TF_WORKING_DIR}
+      #- cd ${TF_WORKING_DIR}
       #- terraform destroy -auto-approve
 
 artifacts:
