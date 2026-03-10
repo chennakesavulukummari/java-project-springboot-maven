@@ -1,0 +1,27 @@
+# Ignore node modules
+web/node_modules/
+web/dist/
+web/.angular/
+
+# Python
+api/__pycache__/
+api/*.pyc
+api/*.pyo
+api/*.pyd
+api/.Python
+api/env/
+api/venv/
+api/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log

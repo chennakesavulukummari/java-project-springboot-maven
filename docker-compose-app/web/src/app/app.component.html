@@ -1,0 +1,29 @@
+<div class="container">
+  <h1>{{ title }}</h1>
+  
+  <div class="add-user-section">
+    <h2>Add New User</h2>
+    <input 
+      [(ngModel)]="newUser.name" 
+      placeholder="Name" 
+      type="text"
+    />
+    <input 
+      [(ngModel)]="newUser.email" 
+      placeholder="Email" 
+      type="email"
+    />
+    <button (click)="addUser()">Add User</button>
+  </div>
+
+  <div class="users-section">
+    <h2>Users</h2>
+    <div *ngIf="users.length === 0">No users found.</div>
+    <div *ngFor="let user of users" class="user-card">
+      <h3>{{ user.name }}</h3>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>ID:</strong> {{ user.id }}</p>
+      <button (click)="deleteUser(user.id)">Delete</button>
+    </div>
+  </div>
+</div>
