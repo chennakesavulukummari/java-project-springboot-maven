@@ -16,7 +16,7 @@ This is a full-stack application using Docker Compose with:
        │ /api/* proxied to
        │
 ┌──────▼──────┐
-│   Python    │ (Port 5000)
+│   Python    │ (Port 5001)
 │   Flask     │
 └──────┬──────┘
        │
@@ -42,7 +42,7 @@ This is a full-stack application using Docker Compose with:
 
 2. **Access the application**:
    - Frontend: http://localhost
-   - API: http://localhost:5000/api
+   - API: http://localhost:5001/api
    - Database: localhost:5432
 
 3. **Stop all services**:
@@ -117,7 +117,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The API will be available at http://localhost:5000
+The API will be available at http://localhost:5001 (or :5000 if running locally outside Docker)
 
 ### Database
 
