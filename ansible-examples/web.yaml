@@ -1,0 +1,28 @@
+---
+- name: Deploy a simple web page
+  hosts: localhost
+  tasks:
+    - name: Create a simple HTML file
+      ansible.builtin.copy:
+        content: "<html><body><h1>Welcome To Ansible World</h1></body></html>"
+        dest: /root/index.html
+
+    - name: Copy the HTML file to the web server directory
+      ansible.builtin.copy:
+        src: /root/index.html
+        dest: /var/www/html/index.html
+
+- name: Install and start Apache web server
+  hosts: localhost
+  tasks:
+    - name: Install Apache
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+
+    - name: Start Apache service
+      ansible.builtin.service:
+        name: apache2
+        state: started
+        enabled: true
+...

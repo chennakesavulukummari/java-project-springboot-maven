@@ -1,0 +1,22 @@
+---
+- name: Configure Apache with handlers
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+
+    - name: Copy Apache config
+      template:
+        src: /etc/apache2/apache2.conf
+        dest: /etc/apache2/sites-available/mysite.conf
+      notify: Restart Apache
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted

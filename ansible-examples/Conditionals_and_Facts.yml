@@ -1,0 +1,17 @@
+---
+- name: OS-specific tasks
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Install on Debian/Ubuntu
+      apt:
+        name: htop
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install on RHEL/CentOS
+      yum:
+        name: htop
+        state: present
+      when: ansible_os_family == "RedHat"
