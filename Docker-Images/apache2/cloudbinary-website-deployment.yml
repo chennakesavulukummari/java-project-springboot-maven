@@ -1,0 +1,147 @@
+---
+# Namespace for cloudbinary-website
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cloudbinary-website
+  labels:
+    name: cloudbinary-website
+    region: ap-south-2
+
+---
+# Deployment for cloudbinary-website
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudbinary-website
+  namespace: cloudbinary-website
+  labels:
+    app: cloudbinary-website
+    version: v1
+    region: ap-south-2
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: cloudbinary-website
+  template:
+    metadata:
+      labels:
+        app: cloudbinary-website
+        version: v1
+        region: ap-south-2
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: topology.kubernetes.io/region
+                operator: In
+                values:
+                - ap-south-2
+      containers:
+      - name: cloudbinary-website
+        image: kesavkummari/cloudbinarywebsite:20260404
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: https
+          containerPort: 443
+          protocol: TCP
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        securityContext:
+          runAsNonRoot: false
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+
+---
+# Service with LoadBalancer for public endpoint
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudbinary-website-lb
+  namespace: cloudbinary-website
+  labels:
+    app: cloudbinary-website
+    region: ap-south-2
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-08652e08206b0dd1d,subnet-09d35585ade4252b5"
+spec:
+  type: LoadBalancer
+  selector:
+    app: cloudbinary-website
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: 443
+  sessionAffinity: None
+  externalTrafficPolicy: Local
+
+---
+# HorizontalPodAutoscaler for auto-scaling
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cloudbinary-website-hpa
+  namespace: cloudbinary-website
+  labels:
+    region: ap-south-2
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cloudbinary-website
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

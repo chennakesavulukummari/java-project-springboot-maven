@@ -1,0 +1,67 @@
+# Cloud Binary - Best DevOps Training Institute in Hyderabad
+# DevOps, AWS, Azure, Docker, Kubernetes, CI/CD, Terraform Training
+
+User-agent: *
+Allow: /
+Allow: /devops-content
+Allow: /cloudops-content
+Allow: /aws-devops-content
+Allow: /azure-devops-content
+Allow: /multi-cloud-devops
+Allow: /finops-content
+Allow: /xops-engineer
+Allow: /learning-path
+Allow: /student-journey
+
+# Block unnecessary crawling of assets and build files
+Disallow: /assets/
+Disallow: /dist/
+Disallow: /node_modules/
+Disallow: /src/
+Disallow: /.git/
+Disallow: /api/
+
+# Allow important crawlers full access
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+# Block problematic crawlers
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# Crawl delay for politeness
+Crawl-delay: 1
+
+# Sitemap locations
+Sitemap: https://cloudbinary.in/sitemap.xml
+Sitemap: https://cloudbinary.in/sitemap-index.xml
+
+# Host directive
+Host: https://cloudbinary.in

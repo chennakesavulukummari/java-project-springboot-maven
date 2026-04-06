@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+
+  <!-- AWS DevOps Training -->
+  <url>
+    <loc>https://cloudbinary.in/aws-devops-content</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://cloudbinary.in/aws-devops-banner.jpg</image:loc>
+      <image:title>AWS DevOps Professional Training Hyderabad</image:title>
+      <image:caption>Master AWS DevOps with hands-on projects and industry certification</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Azure DevOps Training -->
+  <url>
+    <loc>https://cloudbinary.in/azure-devops-content</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://cloudbinary.in/azure-devops-banner.jpg</image:loc>
+      <image:title>Azure DevOps Professional Training Hyderabad</image:title>
+      <image:caption>Comprehensive Azure DevOps training with real-world projects</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Multi-Cloud DevOps Training -->
+  <url>
+    <loc>https://cloudbinary.in/multi-cloud-devops</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://cloudbinary.in/multicloud-devops-banner.jpg</image:loc>
+      <image:title>Multi-Cloud DevOps Training Program Hyderabad</image:title>
+      <image:caption>Learn DevOps across AWS and Azure cloud platforms</image:caption>
+    </image:image>
+  </url>
+
+  <!-- FinOps Training -->
+  <url>
+    <loc>https://cloudbinary.in/finops-content</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://cloudbinary.in/finops-banner.jpg</image:loc>
+      <image:title>FinOps Professional Training Hyderabad</image:title>
+      <image:caption>Master cloud financial operations and cost optimization</image:caption>
+    </image:image>
+  </url>
+
+</urlset>
