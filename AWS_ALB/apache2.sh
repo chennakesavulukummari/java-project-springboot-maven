@@ -14,6 +14,10 @@ sudo git clone https://github.com/kesavkummari/kesavkummari-website-code.git
 cd /opt/kesavkummari-website-code/
 sudo cp -pvr * /var/www/html/
 
+rm -rf /var/www/html/* 
+
+echo "<html><body><h1>Welcome to Kesav's Website</h1><p>This is a placeholder page.</p></body></html>" | sudo tee /var/www/html/index.html
+
 # Optional: Ensure permissions are correct for the web server
 sudo chown -R www-data:www-data /var/www/html/
 sudo chmod -R 755 /var/www/html/

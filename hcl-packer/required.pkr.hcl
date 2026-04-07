@@ -1,0 +1,10 @@
+# required.pkr.hcl - Required plugins configuration
+
+packer {
+  required_plugins {
+    amazon = {
+      version = ">= 1.2.0"
+      source  = "github.com/hashicorp/amazon"
+    }
+  }
+}
