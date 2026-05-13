@@ -6,7 +6,7 @@
     <version>1.0.0</version>
     <!-- <version>3.6.3-SNAPSHOT</version> -->
     <packaging>war</packaging>
-    <name>Cloud Cost Console</name>
+    <name>CloudCostConsole</name>
     <properties>
         <junit.platform.version>1.2.0</junit.platform.version>
         <junit.jupiter.version>5.2.0</junit.jupiter.version>
@@ -104,7 +104,7 @@
                     <version>3.2.2</version>
                     <configuration>
                         <warSourceDirectory>src/main/webapp</warSourceDirectory>
-                        <warName>MoM</warName>
+                        <warName>CloudCostConsole</warName>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
                 </plugin>
@@ -127,6 +127,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <finalName>MoM</finalName>
+        <finalName>CloudCostConsole</finalName>
     </build>
 </project>
