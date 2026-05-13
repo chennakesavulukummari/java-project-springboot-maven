@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.aws.codestar.projecttemplates</groupId>
     <artifactId>CloudCostConsole</artifactId>
-    <version>1.0.0</version>
-    <!-- <version>3.6.3-SNAPSHOT</version> -->
+    <!-- <version>1.0.0</version> -->
+    <version>3.6.3-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>CloudCostConsole</name>
     <properties>
@@ -20,21 +20,21 @@
 
     </properties>
 
-<!-- <distributionManagement>
+<distributionManagement>
 
     <repository>
         <id>release</id>
         <name>libs-release-local</name>
-        <url>http://34.224.156.10:8082/artifactory/libs-release-local/</url>
+        <url>http://98.130.134.161:8082/artifactory/libs-release-local/</url>
     </repository>
 
     <snapshotRepository>
         <id>snapshots</id>
         <name>libs-snapshot-local</name>
-        <url>http://34.224.156.10:8082/artifactory/libs-snapshot-local/</url>
+        <url>http://98.130.134.161:8082/artifactory/libs-snapshot-local/</url>
     </snapshotRepository>
 
-</distributionManagement> -->
+</distributionManagement>
 
     
     <dependencies>
