@@ -11,9 +11,9 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      #- mvn clean validate compile test install verify package
-      - cp -pvr settings.xml /root/.m2/settings.xml
-      - ls -lrt /root/.m2/settings.xml
+      # - mvn clean validate compile test install verify package
+      # - cp -pvr settings.xml /root/.m2/settings.xml
+      # - ls -lrt /root/.m2/settings.xml
       # - mvn clean verify sonar:sonar
       #- export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain mom --domain-owner 225989338000 --region ap-south-1 --query authorizationToken --output text`
       # - mvn deploy -DskipTests=true 
@@ -34,7 +34,7 @@ phases:
       #   -T $WAR_FILE \
       #   "http://16.112.118.177:8080/manager/text/deploy?path=/cloudbinary&update=true"
       #- curl -u admin:redhat@123 -T target/**.war "http://54.82.55.29:8080/manager/text/deploy?path=/cloudbinary&update=true"'
-      - curl -u admin:redhat@123 -T target/*.war "http://16.112.189.25:8080/manager/text/deploy?path=/cloudbinary&update=true"
+      # - curl -u admin:redhat@123 -T target/*.war "http://16.112.189.25:8080/manager/text/deploy?path=/cloudbinary&update=true"
 artifacts:
   base-directory: target
   files:

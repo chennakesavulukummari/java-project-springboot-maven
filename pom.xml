@@ -2,11 +2,11 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.aws.codestar.projecttemplates</groupId>
-    <artifactId>MoM</artifactId>
+    <artifactId>CloudCostConsole</artifactId>
     <version>1.0.0</version>
     <!-- <version>3.6.3-SNAPSHOT</version> -->
     <packaging>war</packaging>
-    <name>Made Of Memories - Sample Spring MVC Application</name>
+    <name>Cloud Cost Console</name>
     <properties>
         <junit.platform.version>1.2.0</junit.platform.version>
         <junit.jupiter.version>5.2.0</junit.jupiter.version>
