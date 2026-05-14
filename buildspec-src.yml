@@ -12,12 +12,12 @@ phases:
     commands:
       - echo Build started on `date`
       # - mvn clean validate compile test install verify package
-      - cp -pvr settings.xml /root/.m2/settings.xml
-      - ls -lrt /root/.m2/settings.xml
-      # - mvn clean verify sonar:sonar
+      # - cp -pvr settings.xml /root/.m2/settings.xml
+      # - ls -lrt /root/.m2/settings.xml
+      - mvn clean verify sonar:sonar
       #- export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain mom --domain-owner 225989338000 --region ap-south-1 --query authorizationToken --output text`
-      - mvn deploy -DskipTests=true 
-      # - mvn package -DskipTests=true
+      - mvn package -DskipTests=true
+      # - mvn deploy -DskipTests=true 
       # - curl -u admin:admin123 -T target/*.war "http://40.192.110.39:8080/manager/text/deploy?path=/eg&update=true"
       # - echo Build completed on `date`
   post_build:
