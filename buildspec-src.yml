@@ -17,7 +17,7 @@ phases:
       # - mvn clean verify sonar:sonar
       #- export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain mom --domain-owner 225989338000 --region ap-south-1 --query authorizationToken --output text`
       # - pwd
-      # - cd sample-tomcat-app/
+      - cd sample-tomcat-app/
       - pwd
       - ls -lrt
       - mvn package -DskipTests=true
