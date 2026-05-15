@@ -1,49 +1,31 @@
-version: 0.2 
+version: 0.2
+
 phases:
   install:
     runtime-versions:
-      java : corretto17
+      java: corretto17
+
   pre_build:
     commands:
-      - echo "pre-build started"
+      - echo "Pre-build started"
       - pwd
       - ls -lrta
+
   build:
     commands:
-      - echo Build started on `date`
-      # - mvn clean validate compile test install verify package
-      # - cp -pvr settings.xml /root/.m2/settings.xml
-      # - ls -lrt /root/.m2/settings.xml
-      # - mvn clean verify sonar:sonar
-      #- export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain mom --domain-owner 225989338000 --region ap-south-1 --query authorizationToken --output text`
-      # - pwd
-      - cd sample-tomcat-app/
+      - echo "Build started on $(date)"
+      - cd sample-tomcat-app
       - pwd
       - ls -lrt
-      - mvn package -DskipTests=true
-      # - mvn deploy -DskipTests=true 
-      - curl -u admin:redhat@123 -T target/*.war "http://40.192.105.155:8080/manager/text/deploy?path=/eg&update=true"
-      # - echo Build completed on `date`
-  post_build:
-    commands:
-      # - echo Deliver Artifact To Remote Tomcat Server `date`
-      # - echo "Deploying to Tomcat..."
-      # - pwd
-      # - cd sample-tomcat-app/
-      # - pwd
-      # - ls -lrt
-      # - ls -lrta target/*.war
-      # - echo "Deploying target/*.war"
-      # - WAR_FILE=$(ls target/*.war | head -n 1)
-      # - echo "Deploying $WAR_FILE"
-      # - curl --fail --show-error --silent \
-      #   -u admin:redhat@123 \
-      #   -T $WAR_FILE \
-      #   "http://16.112.118.177:8080/manager/text/deploy?path=/cloudbinary&update=true"
-      # - curl -u admin:redhat@123 -T target/**.war "http://40.192.105.155:8080/manager/text/deploy?path=/cloudbinary&update=true"
-      # - curl -u admin:redhat@123 -T target/*.war "http://16.112.189.25:8080/manager/text/deploy?path=/cloudbinary&update=true"
+      - mvn clean package -DskipTests=true
+      - ls -lrt target/
+      - curl --fail --show-error --silent \
+          -u admin:redhat@123 \
+          -T target/*.war \
+          "http://40.192.105.155:8080/manager/text/deploy?path=/cloudbinary&update=true"
+      - echo "Deployment completed successfully"
+
 artifacts:
-  base-directory: target
+  base-directory: sample-tomcat-app/target
   files:
-    # - target/*.war
-    - "**/*"
+    - "*.war"
