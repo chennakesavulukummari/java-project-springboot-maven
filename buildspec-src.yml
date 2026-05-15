@@ -40,7 +40,7 @@ phases:
       #   -u admin:redhat@123 \
       #   -T $WAR_FILE \
       #   "http://16.112.118.177:8080/manager/text/deploy?path=/cloudbinary&update=true"
-      - curl -u admin:redhat@123 -T target/**.war "http://40.192.105.155:8080/manager/text/deploy?path=/cloudbinary&update=true"
+      - curl -u admin:redhat@123 -T target/**.war "http://40.192.105.155:8080/manager/text/deploy?path=/c3ops&update=true"
       # - curl -u admin:redhat@123 -T target/*.war "http://16.112.189.25:8080/manager/text/deploy?path=/cloudbinary&update=true"
 artifacts:
   base-directory: target
