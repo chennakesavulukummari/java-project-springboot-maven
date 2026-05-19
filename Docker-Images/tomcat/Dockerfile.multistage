@@ -1,0 +1,145 @@
+# ============================================================================
+# Multi-Stage Dockerfile: Tomcat with Java Artifact Deployment
+# Optimized for minimal image size
+# ============================================================================
+
+# Stage 1: Build Stage
+# ============================================================================
+FROM maven:3.9.0-eclipse-temurin-17 AS builder
+
+LABEL stage=builder \
+      description="Build stage for compiling Java application"
+
+# Build-time arguments
+ARG BUILD_ENV=production
+ARG MAVEN_OPTS="-Xmx512m -Xms256m"
+ARG APP_VERSION=1.0.0
+
+# Set environment variables for Maven
+ENV MAVEN_OPTS=${MAVEN_OPTS}
+
+# Set working directory
+WORKDIR /build
+
+# Copy project files (pom.xml and source code)
+COPY pom.xml .
+COPY src ./src
+COPY settings.xml /root/.m2/
+
+# Build the application
+# This will create a WAR/JAR file in the target directory
+RUN mvn clean package \
+    -DskipTests \
+    -Denv=${BUILD_ENV} \
+    -Dmaven.compiler.source=17 \
+    -Dmaven.compiler.target=17 && \
+    ls -la target/
+
+# ============================================================================
+# Stage 2: Runtime Stage (Tomcat)
+# ============================================================================
+FROM tomcat:10-jre17-alpine
+
+LABEL maintainer="dev-team@example.com" \
+      description="Tomcat runtime with Java artifact" \
+      version="1.0.0"
+
+# Build-time arguments
+ARG APP_VERSION=1.0.0
+ARG APP_NAME=myapp
+
+# Environment variables
+ENV CATALINA_HOME=/usr/local/tomcat \
+    JAVA_OPTS="-Xmx1024m -Xms512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200" \
+    APP_VERSION=${APP_VERSION} \
+    APP_NAME=${APP_NAME}
+
+# Working directory
+WORKDIR ${CATALINA_HOME}
+
+# Remove unnecessary default webapps to reduce image size
+RUN rm -rf ${CATALINA_HOME}/webapps/* && \
+    rm -rf ${CATALINA_HOME}/work/* && \
+    rm -rf ${CATALINA_HOME}/logs/*
+
+# Create required directories
+RUN mkdir -p ${CATALINA_HOME}/webapps/ROOT && \
+    mkdir -p ${CATALINA_HOME}/logs && \
+    mkdir -p ${CATALINA_HOME}/work && \
+    mkdir -p /opt/app
+
+# Copy the built artifact from builder stage
+# Assuming the build produces a WAR file named app.war
+COPY --from=builder /build/target/*.war ${CATALINA_HOME}/webapps/ROOT.war
+
+# Alternative: If building a JAR for embedded Tomcat
+# COPY --from=builder /build/target/*.jar /opt/app/app.jar
+
+# Copy Tomcat configuration files (optional)
+COPY --chown=tomcat:tomcat tomcat/context.xml ${CATALINA_HOME}/conf/context.xml || true
+COPY --chown=tomcat:tomcat tomcat/server.xml ${CATALINA_HOME}/conf/server.xml || true
+
+# Create tomcat user and setup permissions
+RUN useradd -M -s /sbin/nologin tomcat || true && \
+    chown -R tomcat:tomcat ${CATALINA_HOME} && \
+    chmod -R 755 ${CATALINA_HOME}/bin
+
+# Run as non-root user
+USER tomcat
+
+# Expose Tomcat port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost:8080/ || exit 1
+
+# Set default shell
+SHELL ["/bin/sh", "-c"]
+
+# Define stop signal
+STOPSIGNAL SIGTERM
+
+# Entrypoint to start Tomcat
+ENTRYPOINT ["catalina.sh", "run"]
+
+# ============================================================================
+# Build Examples:
+# ============================================================================
+# Build the image:
+#   docker build -t myapp-tomcat:1.0.0 -f Dockerfile.multistage .
+#
+# Build with custom arguments:
+#   docker build \
+#     --build-arg BUILD_ENV=staging \
+#     --build-arg APP_VERSION=2.0.0 \
+#     --build-arg APP_NAME=myapp \
+#     -t myapp-tomcat:2.0.0 \
+#     -f Dockerfile.multistage .
+#
+# Run the container:
+#   docker run -d \
+#     --name myapp \
+#     -p 8080:8080 \
+#     -v /var/log/tomcat:/usr/local/tomcat/logs \
+#     -e JAVA_OPTS="-Xmx2g -Xms1g" \
+#     myapp-tomcat:1.0.0
+#
+# Check Tomcat logs:
+#   docker logs -f myapp
+#
+# Access Tomcat Manager (if included):
+#   curl http://localhost:8080/
+#
+# ============================================================================
+# Image Size Optimization Benefits:
+# ============================================================================
+# 1. First stage includes only build dependencies (Maven, JDK compilation tools)
+# 2. Second stage uses minimal Alpine Linux + JRE (no JDK or build tools)
+# 3. Removed default Tomcat webapps (examples, docs, manager)
+# 4. Final image size: ~300-400MB (vs 1GB+ with single-stage)
+#
+# To check image size:
+#   docker images | grep myapp-tomcat
+#
+# ============================================================================

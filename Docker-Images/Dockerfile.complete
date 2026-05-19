@@ -1,0 +1,122 @@
+# ============================================================================
+# Multi-Stage Build: Dockerfile demonstrating all Docker instructions
+# ============================================================================
+
+# Stage 1: Build Stage
+# FROM - Create a new build stage from a base image
+FROM maven:3.9.0-eclipse-temurin-17 AS builder
+
+# LABEL - Add metadata to an image
+LABEL maintainer="info@c3ops.io" \
+      version="1.0" \
+      description="Spring Boot Maven Application Builder"
+
+# ARG - Use build-time variables (can be passed during build)
+ARG BUILD_ENV=production
+ARG APP_VERSION=1.0.0
+
+# WORKDIR - Change working directory
+WORKDIR /app
+
+# COPY - Copy files and directories from host to container
+COPY pom.xml .
+COPY src ./src
+COPY settings.xml /root/.m2/
+
+# RUN - Execute build commands
+RUN mvn clean package -DskipTests -Denv=${BUILD_ENV}
+
+# ============================================================================
+# Stage 2: Runtime Stage
+# ============================================================================
+FROM eclipse-temurin:17-jre-alpine
+
+# LABEL - Add metadata to an image
+LABEL maintainer="dev-team@example.com" \
+      version="1.0" \
+      description="Spring Boot Application Runtime" \
+      app.version="${APP_VERSION}"
+
+# MAINTAINER - Specify the author of an image
+MAINTAINER dev-team@example.com
+
+# ARG - Build-time variables
+ARG APP_VERSION=1.0.0
+ARG APP_PORT=8080
+
+# ENV - Set environment variables
+ENV JAVA_OPTS="-Xmx512m -Xms256m" \
+    APP_NAME="springboot-app" \
+    APP_VERSION=${APP_VERSION} \
+    APP_PORT=${APP_PORT} \
+    ENVIRONMENT=production
+
+# WORKDIR - Change working directory
+WORKDIR /opt/app
+
+# COPY - Copy built application from builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
+# RUN - Execute build commands to setup runtime
+RUN addgroup -S appuser && \
+    adduser -S appuser -G appuser && \
+    chown -R appuser:appuser /opt/app
+
+# USER - Set user and group ID
+USER appuser
+
+# EXPOSE - Describe which ports your application is listening on
+EXPOSE ${APP_PORT}
+
+# VOLUME - Create volume mounts for logs and data
+VOLUME ["/var/log/app", "/opt/app/data"]
+
+# HEALTHCHECK - Check a container's health on startup
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost:${APP_PORT}/actuator/health || exit 1
+
+# SHELL - Set the default shell of an image
+SHELL ["/bin/sh", "-c"]
+
+# STOPSIGNAL - Specify the system call signal for exiting a container
+STOPSIGNAL SIGTERM
+
+# ENTRYPOINT - Specify default executable
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
+
+# CMD - Specify default commands (can be overridden)
+# (Note: When using ENTRYPOINT with shell form, CMD is not typically used,
+#  but here's an example if using exec form ENTRYPOINT)
+# CMD ["--server.port=${APP_PORT}"]
+
+# ONBUILD - Specify instructions for when the image is used in a build
+# (Useful when this image is used as a base image for other builds)
+ONBUILD RUN echo "Building child image from this base..."
+ONBUILD ARG BUILD_DATE
+ONBUILD LABEL build.date=${BUILD_DATE}
+
+# ============================================================================
+# Build and Run Examples:
+# ============================================================================
+# Build with default arguments:
+#   docker build -t springboot-app:1.0.0 .
+#
+# Build with custom arguments:
+#   docker build \
+#     --build-arg BUILD_ENV=staging \
+#     --build-arg APP_VERSION=2.0.0 \
+#     -t springboot-app:2.0.0 .
+#
+# Run the container:
+#   docker run -d \
+#     -p 8080:8080 \
+#     -v /var/log/app:/var/log/app \
+#     -e JAVA_OPTS="-Xmx1g -Xms512m" \
+#     springboot-app:1.0.0
+#
+# Run with environment variable override:
+#   docker run -d \
+#     -p 9090:8080 \
+#     -e APP_PORT=9090 \
+#     springboot-app:1.0.0
+# ============================================================================
